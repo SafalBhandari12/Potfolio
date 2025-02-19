@@ -301,7 +301,6 @@ const HeroSection = () => {
           </div>
         </motion.div>
       </div>
-
     </section>
   );
 };
@@ -311,8 +310,8 @@ const ExperienceSection = () => {
     {
       company: "UNIIT Technology Pvt. Ltd",
       role: "Data Science & ML Intern",
-      period: "Jun 2024 - Sep 2024",
-      icon: <Briefcase className='h-8 w-8 text-blue-400' />,
+      period: "Jun 2024 - September 2024",
+      icon: <Briefcase className='h-4 w-4' />,
       highlights: [
         "Conducted comprehensive EDA on customer data to uncover 3 key trends and insights",
         "Utilized K-Means clustering, PCA, and decision trees for effective segmentation strategies",
@@ -322,14 +321,13 @@ const ExperienceSection = () => {
       ],
     },
     {
-      company: "Eye Disease Classification",
-      role: "Student Researcher",
+      company: "Eye Disease Classification Research",
+      role: "Lead Researcher",
       period: "Jan 2025 - Feb 2025",
-      icon: <BookOpen className='h-8 w-8 text-purple-400' />,
+      icon: <BookOpen className='h-4 w-4' />,
       highlights: [
         "Led research initiative under Prof. Ruqaiya Khanam for classifying 12 eye diseases",
         "Integrated Swin Transformer Tiny with EfficientNet-B2 for hybrid model architecture",
-        "Designed optimized architecture with residual blocks and window attention",
         "Reduced computational complexity to ~2B FLOPs while achieving 97% classification accuracy",
         "Processed dataset of 48,000 medical images using advanced TensorFlow techniques",
       ],
@@ -338,49 +336,112 @@ const ExperienceSection = () => {
 
   return (
     <section className='py-20 bg-gradient-to-b from-black to-gray-900 relative'>
-      {/* 3D Geometric Shapes */}
-      <div className='absolute hidden lg:block top-1/4 -left-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl' />
-      <div className='absolute hidden lg:block bottom-1/4 -right-20 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl' />
-
       <div className='container mx-auto px-4 relative z-10'>
-        <SectionHeader title='Professional Experience' />
+        <SectionHeader title='Professional Journey' />
 
-        <div className='grid lg:grid-cols-2 gap-10'>
-          {experiences.map((exp, index) => (
-            <Card3D
-              key={index}
-              className='bg-gray-800/50 rounded-2xl backdrop-blur-lg border border-gray-700 hover:border-blue-400/50 transition-all overflow-hidden'
-            >
-              <div className='p-8 space-y-6'>
-                <div className='flex justify-between items-start'>
-                  <div className='flex gap-4'>
-                    <div className='mt-1'>{exp.icon}</div>
-                    <div>
-                      <h3 className='text-2xl font-bold'>{exp.company}</h3>
-                      <p className='text-blue-400 mt-1'>{exp.role}</p>
-                    </div>
-                  </div>
-                  <span className='text-gray-400 text-sm py-1 px-3 bg-gray-800 rounded-full'>
-                    {exp.period}
-                  </span>
-                </div>
+        <div className='relative mx-auto max-w-6xl'>
+          {/* Timeline line */}
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{ duration: 1.2, ease: [0.19, 1.0, 0.22, 1.0] }}
+            className='absolute left-1/2 w-1 h-full bg-gradient-to-b from-blue-500 to-purple-600 origin-top transform -translate-x-1/2 shadow-2xl'
+          />
 
-                <ul className='space-y-4'>
-                  {exp.highlights.map((highlight, i) => (
-                    <li key={i} className='flex items-start gap-3'>
-                      <div className='min-w-2 h-2 rounded-full bg-blue-400 mt-2' />
-                      <p className='text-gray-300 text-sm lg:text-base'>
-                        {highlight}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Card3D>
-          ))}
+          {/* Reduced vertical spacing between timeline items */}
+          <div className='space-y-0'>
+            {experiences.map((exp, index) => (
+              <TimelineItem
+                key={index}
+                experience={exp}
+                index={index}
+                totalItems={experiences.length}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
+  );
+};
+
+const TimelineItem = ({ experience, index, totalItems }) => {
+  const controls = useAnimation();
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isEven = index % 2 === 0;
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    }
+  }, [controls, isInView]);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial='hidden'
+      animate={controls}
+      variants={{
+        hidden: { opacity: 0, x: isEven ? -50 : 50 },
+        visible: { opacity: 1, x: 0 },
+      }}
+      transition={{ duration: 0.6, delay: index * 0.15 }}
+      className={`relative flex ${
+        isEven ? "justify-start" : "justify-end"
+      } items-start`}
+    >
+      {/* Timeline dot */}
+      <div
+        className={`absolute left-1/2 top-6 w-4 h-4 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center z-10 shadow-xl`}
+      >
+        <div className='w-2 h-2 bg-white rounded-full animate-pulse' />
+      </div>
+
+      {/* Connector line */}
+      {index !== totalItems - 1 && (
+        <div className='absolute left-1/2 top-14 h-[calc(100%-3.5rem)] w-1 bg-gradient-to-b from-blue-500/20 to-purple-600/20 transform -translate-x-1/2' />
+      )}
+
+      <Card3D
+        className={`w-full md:w-[45%] ${
+          isEven ? "mr-8" : "ml-8"
+        } bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl overflow-hidden hover:border-blue-400/30 transition-all`}
+      >
+        <div className='p-6 space-y-4'>
+          <div className='flex justify-between items-start'>
+            <div>
+              <h3 className='text-lg font-semibold text-white'>
+                {experience.company}
+              </h3>
+              <p className='text-blue-400 text-sm mt-1 font-medium'>
+                {experience.role}
+              </p>
+            </div>
+            <span className='text-xs text-gray-400 bg-gray-700/50 px-2.5 py-1 rounded-full'>
+              {experience.period}
+            </span>
+          </div>
+
+          <ul className='space-y-2.5'>
+            {experience.highlights.map((highlight, i) => (
+              <motion.li
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 + i * 0.05 }}
+                className='flex items-start text-sm leading-relaxed'
+              >
+                <div className='flex-shrink-0 mt-1.5 mr-3'>
+                  <div className='w-1.5 h-1.5 bg-blue-400 rounded-full' />
+                </div>
+                <p className='text-gray-300'>{highlight}</p>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+      </Card3D>
+    </motion.div>
   );
 };
 
