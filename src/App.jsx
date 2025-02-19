@@ -1,71 +1,18 @@
-import React, { useEffect, useState, useRef, Suspense } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import React, { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 import {
-  OrbitControls,
-  Text3D,
-  Float,
-  PerspectiveCamera,
-  useGLTF,
-} from "@react-three/drei";
-import {
-  Github,
-  Linkedin,
   Mail,
   Phone,
+  Linkedin,
+  Github,
   ExternalLink,
   ChevronDown,
+  Camera,
 } from "lucide-react";
-
-// 3D Text Component
-const AnimatedText = ({ text, position, rotation }) => {
-  const meshRef = useRef();
-
-  useFrame((state) => {
-    meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime) * 0.1;
-  });
-
-  return (
-    <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
-      <Text3D
-        ref={meshRef}
-        font='/helvetiker_regular.typeface.json'
-        size={0.5}
-        height={0.2}
-        position={position}
-        rotation={rotation}
-      >
-        {text}
-        <meshNormalMaterial />
-      </Text3D>
-    </Float>
-  );
-};
-
-// Animated Background Sphere
-const AnimatedSphere = () => {
-  const meshRef = useRef();
-
-  useFrame((state) => {
-    meshRef.current.rotation.x = state.clock.elapsedTime * 0.2;
-    meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
-  });
-
-  return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[1, 32, 32]} />
-      <meshPhongMaterial wireframe color='#4338ca' />
-    </mesh>
-  );
-};
 
 const App = () => {
   const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef();
-  const { scrollYProgress } = useScroll();
-
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "200%"]);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -73,27 +20,46 @@ const App = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8 },
-  };
+  // Timeline Item Component
+  const TimelineItem = ({ date, title, company, description, isLeft }) => (
+    <motion.div
+      initial={{ opacity: 0, x: isLeft ? -100 : 100 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className={`flex w-full ${isLeft ? "justify-start" : "justify-end"} mb-8`}
+    >
+      <div
+        className={`w-5/12 relative ${
+          isLeft ? "text-right pr-8" : "text-left pl-8"
+        }`}
+      >
+        <div
+          className={`absolute ${
+            isLeft ? "right-0" : "left-0"
+          } top-0 w-2 h-full bg-gradient-to-b from-blue-400 to-purple-600`}
+        />
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className='bg-white/5 rounded-2xl p-6 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all'
+        >
+          <span className='text-blue-400 text-sm'>{date}</span>
+          <h3 className='text-2xl font-bold mt-2'>{title}</h3>
+          <p className='text-purple-400 mt-1'>{company}</p>
+          <p className='text-gray-300 mt-4'>{description}</p>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
 
   return (
-    <div className='bg-black text-white min-h-screen' ref={containerRef}>
-      {/* Hero Section with 3D Elements */}
+    <div
+      className='bg-gradient-to-b from-gray-900 to-black text-white min-h-screen'
+      ref={containerRef}
+    >
+      {/* Hero Section */}
       <section className='h-screen relative overflow-hidden'>
-        <div className='absolute inset-0'>
-          <Canvas>
-            <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} />
-            <Suspense fallback={null}>
-              <AnimatedSphere />
-            </Suspense>
-            <OrbitControls enableZoom={false} />
-          </Canvas>
-        </div>
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(67,56,202,0.1)_0%,transparent_100%)]' />
 
         <div className='relative z-10 h-full flex flex-col items-center justify-center'>
           <motion.div
@@ -109,223 +75,215 @@ const App = () => {
               Data Science & Machine Learning Engineer
             </p>
             <div className='flex justify-center space-x-6'>
-              <motion.a
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                href='mailto:safalbhandari069@gmail.com'
-                className='flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all'
-              >
-                <Mail size={20} /> Email
-              </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                href='tel:+917847915622'
-                className='flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all'
-              >
-                <Phone size={20} /> Call
-              </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                href='#'
-                className='flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all'
-              >
-                <Linkedin size={20} /> LinkedIn
-              </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                href='#'
-                className='flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all'
-              >
-                <Github size={20} /> GitHub
-              </motion.a>
+              {[
+                {
+                  icon: <Mail className='w-5 h-5' />,
+                  text: "Email",
+                  href: "mailto:safalbhandari069@gmail.com",
+                },
+                {
+                  icon: <Phone className='w-5 h-5' />,
+                  text: "Call",
+                  href: "tel:+917847915622",
+                },
+                {
+                  icon: <Linkedin className='w-5 h-5' />,
+                  text: "LinkedIn",
+                  href: "#",
+                },
+                {
+                  icon: <Github className='w-5 h-5' />,
+                  text: "GitHub",
+                  href: "#",
+                },
+              ].map((link, index) => (
+                <motion.a
+                  key={index}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  href={link.href}
+                  className='flex items-center gap-2 bg-white/10 px-6 py-3 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all'
+                >
+                  {link.icon} {link.text}
+                </motion.a>
+              ))}
             </div>
           </motion.div>
 
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 2 }}
-            className='absolute bottom-10'
+            className='absolute bottom-10 left-1/2 transform -translate-x-1/2'
           >
-            <ChevronDown size={40} className='text-white/50' />
+            <ChevronDown className='w-10 h-10 text-white/50' />
           </motion.div>
         </div>
       </section>
 
-      {/* Experience Section with Parallax */}
+      {/* Experience Timeline Section */}
       <section className='py-20 relative'>
-        <motion.div
-          style={{ y: backgroundY }}
-          className='absolute inset-0 bg-gradient-to-b from-blue-900/20 to-purple-900/20'
-        />
+        <div className='absolute inset-0 bg-gradient-to-b from-blue-900/20 to-purple-900/20' />
 
         <div className='container mx-auto px-4 relative'>
           <motion.h2
-            {...fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             className='text-5xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600'
           >
-            Professional Experience
+            Professional Journey
           </motion.h2>
 
-          <div className='space-y-12'>
-            <motion.div
-              initial={{ opacity: 0, x: -100 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className='bg-white/5 rounded-2xl p-8 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all'
-            >
-              <h3 className='text-3xl font-bold mb-4'>
-                UNIIT Technology Pvt. Ltd
-              </h3>
-              <p className='text-blue-400 mb-6'>
-                Data Science and Machine Learning Intern | June 2024-September
-                2024
-              </p>
-              <ul className='space-y-4 text-gray-300'>
-                <li className='flex items-start gap-4'>
-                  <div className='w-2 h-2 mt-2 rounded-full bg-blue-400' />
-                  <p>
-                    Conducted comprehensive exploratory data analysis on
-                    customer data to uncover 3 key trends and insights
-                  </p>
-                </li>
-                <li className='flex items-start gap-4'>
-                  <div className='w-2 h-2 mt-2 rounded-full bg-blue-400' />
-                  <p>
-                    Automated monthly reporting with Python and SQL, reducing
-                    manual workload by 30%
-                  </p>
-                </li>
-                <li className='flex items-start gap-4'>
-                  <div className='w-2 h-2 mt-2 rounded-full bg-blue-400' />
-                  <p>
-                    Collaborated with software engineers to deploy production
-                    data models and integrate an LLM-powered chatbot
-                  </p>
-                </li>
-              </ul>
-            </motion.div>
+          <div className='relative'>
+            <div className='absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-blue-400 to-purple-600' />
 
-            {/* Similar motion.div for Student Researcher section */}
+            <TimelineItem
+              date='June 2024 - September 2024'
+              title='Data Science and Machine Learning Intern'
+              company='UNIIT Technology Pvt. Ltd'
+              description='Conducted comprehensive exploratory data analysis and implemented ML models, reducing manual workload by 30%.'
+              isLeft={true}
+            />
+
+            <TimelineItem
+              date='January 2025 - February 2025'
+              title='Student Researcher'
+              company='Eye Disease Classification Project'
+              description='Led research initiative achieving 97% classification accuracy using hybrid deep learning model.'
+              isLeft={false}
+            />
           </div>
         </div>
       </section>
 
-      {/* Projects Section with 3D Cards */}
-      <section className='py-20 relative overflow-hidden'>
+      {/* Projects Section */}
+      <section className='py-20 relative'>
         <div className='container mx-auto px-4'>
           <motion.h2
-            {...fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             className='text-5xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600'
           >
             Featured Projects
           </motion.h2>
 
           <div className='grid md:grid-cols-2 gap-8'>
-            <motion.div
-              whileHover={{ scale: 1.02, rotateY: 5 }}
-              className='bg-white/5 rounded-2xl p-8 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all transform perspective-1000'
-            >
-              <div className='flex justify-between items-start mb-6'>
-                <h3 className='text-3xl font-bold'>FinFusion</h3>
-                <motion.a
-                  whileHover={{ scale: 1.2, rotate: 45 }}
-                  whileTap={{ scale: 0.8 }}
-                  href='#'
-                  className='text-blue-400 hover:text-blue-300'
-                >
-                  <ExternalLink size={24} />
-                </motion.a>
-              </div>
-              <p className='text-gray-300 mb-6'>
-                AI-Driven Fintech Platform for Smart Investment & Market
-                Intelligence
-              </p>
-              <div className='flex flex-wrap gap-2 mb-6'>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  AI
-                </span>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  Fintech
-                </span>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  Machine Learning
-                </span>
-              </div>
-              <ul className='space-y-4 text-gray-300'>
-                <li className='flex items-start gap-4'>
-                  <div className='w-2 h-2 mt-2 rounded-full bg-blue-400' />
-                  <p>
-                    Developed AI-powered SaaS platform integrating multiple data
-                    sources
-                  </p>
-                </li>
-                {/* More list items */}
-              </ul>
-            </motion.div>
-
-            {/* Similar motion.div for Plant Disease Detection project */}
+            {[
+              {
+                title: "FinFusion",
+                description:
+                  "AI-Driven Fintech Platform for Smart Investment & Market Intelligence",
+                tags: ["AI", "Fintech", "Machine Learning"],
+                details:
+                  "Developed AI-powered SaaS platform integrating multiple data sources",
+              },
+              {
+                title: "Plant Disease Detection",
+                description: "AI-Driven Solution for Plant Health Monitoring",
+                tags: ["Computer Vision", "Deep Learning", "Mobile App"],
+                details:
+                  "Developed AI-powered crop disease detection system with 97% accuracy",
+              },
+            ].map((project, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                className='bg-white/5 rounded-2xl p-8 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all group'
+              >
+                <div className='flex justify-between items-start mb-4'>
+                  <h3 className='text-3xl font-bold'>{project.title}</h3>
+                  <motion.a
+                    whileHover={{ scale: 1.2 }}
+                    href='#'
+                    className='text-blue-400 hover:text-blue-300'
+                  >
+                    <ExternalLink className='w-6 h-6' />
+                  </motion.a>
+                </div>
+                <p className='text-gray-300 mb-6'>{project.description}</p>
+                <div className='flex flex-wrap gap-2 mb-6'>
+                  {project.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <p className='text-gray-300'>{project.details}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Skills Section with 3D Grid */}
-      <section className='py-20 relative'>
+      {/* Skills Section */}
+      <section className='py-20 relative bg-gradient-to-b from-gray-900/50 to-black'>
         <div className='container mx-auto px-4'>
           <motion.h2
-            {...fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             className='text-5xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600'
           >
             Skills & Expertise
           </motion.h2>
 
           <div className='grid md:grid-cols-3 gap-8'>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className='bg-white/5 rounded-2xl p-8 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all'
-            >
-              <h3 className='text-2xl font-bold mb-6'>
-                Programming Languages & Frameworks
-              </h3>
-              <div className='flex flex-wrap gap-2'>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  Python
-                </span>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  FastAPI
-                </span>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  Flask
-                </span>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  Django
-                </span>
-                <span className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'>
-                  React Native
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Similar motion.div for other skills sections */}
+            {[
+              {
+                title: "Programming Languages & Frameworks",
+                skills: [
+                  "Python",
+                  "FastAPI",
+                  "Flask",
+                  "Django",
+                  "React Native",
+                ],
+              },
+              {
+                title: "AI & Machine Learning",
+                skills: ["TensorFlow", "PyTorch", "NLP", "CNN", "LLM"],
+              },
+              {
+                title: "Data Science & Tools",
+                skills: ["ETL", "Statistics", "MongoDB", "PostgreSQL", "Git"],
+              },
+            ].map((category, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                className='bg-white/5 rounded-2xl p-8 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all'
+              >
+                <h3 className='text-2xl font-bold mb-6'>{category.title}</h3>
+                <div className='flex flex-wrap gap-2'>
+                  {category.skills.map((skill, i) => (
+                    <span
+                      key={i}
+                      className='px-3 py-1 bg-blue-900/30 rounded-full text-sm'
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Education Section with 3D Elements */}
+      {/* Education Section */}
       <section className='py-20 relative'>
         <div className='container mx-auto px-4'>
           <motion.h2
-            {...fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             className='text-5xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600'
           >
             Education
           </motion.h2>
 
           <motion.div
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.05 }}
             className='bg-white/5 rounded-2xl p-8 backdrop-blur-lg border border-white/10 hover:border-white/20 transition-all max-w-2xl mx-auto'
           >
             <h3 className='text-3xl font-bold mb-4'>Sharda University</h3>
@@ -346,7 +304,7 @@ const App = () => {
         </div>
       </section>
 
-      {/* Footer with Gradient */}
+      {/* Footer */}
       <footer className='py-8 relative'>
         <div className='absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent' />
         <div className='relative text-center text-gray-400'>
