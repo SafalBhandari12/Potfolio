@@ -302,13 +302,6 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      <motion.div
-        animate={{ y: [0, 15, 0] }}
-        transition={{ repeat: Infinity, duration: 2.5 }}
-        className='absolute bottom-4 left-1/2 -translate-x-1/2'
-      >
-        <ChevronDown className='w-10 h-10 text-white/50' />
-      </motion.div>
     </section>
   );
 };
