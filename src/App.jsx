@@ -101,7 +101,7 @@ const HeroSection = () => {
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTkuNSA2MEgwbDYwLTYwVjYwek0wIDB2NjBMNjAgMEgweiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDEwMCwgMTAwLCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjAuNSIvPjwvc3ZnPg==')] opacity-20" />
 
-      <div className='relative z-10 container mx-auto h-full flex flex-col lg:flex-row items-center justify-center px-4 pt-20 gap-16'>
+      <div className='relative z-10 container mx-auto h-full flex flex-col lg:flex-row items-center justify-center px-4 pt-10 gap-8'>
         {/* Profile Card */}
         <Card3D className='w-full lg:w-1/2 max-w-xl bg-gradient-to-br from-gray-900/90 to-gray-800/90 rounded-3xl border border-gray-700 shadow-2xl overflow-hidden'>
           <div className='p-8 space-y-8 backdrop-blur-sm'>
@@ -305,7 +305,7 @@ const HeroSection = () => {
       <motion.div
         animate={{ y: [0, 15, 0] }}
         transition={{ repeat: Infinity, duration: 2.5 }}
-        className='absolute bottom-8 left-1/2 -translate-x-1/2'
+        className='absolute bottom-4 left-1/2 -translate-x-1/2'
       >
         <ChevronDown className='w-10 h-10 text-white/50' />
       </motion.div>
@@ -683,7 +683,7 @@ const ContactSection = () => {
 
 const App = () => {
   return (
-    <div className='text-white bg-black'>
+    <div className='text-white bg-black overflow-x-hidden'>
       <HeroSection />
       <ExperienceSection />
       <ProjectSection />
@@ -700,6 +700,11 @@ const App = () => {
 
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+        html,
+        body {
+          overflow-x: hidden;
+        }
 
         body {
           font-family: "Inter", sans-serif;
